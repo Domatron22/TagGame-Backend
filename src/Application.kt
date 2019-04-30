@@ -82,7 +82,7 @@ fun Application.module(testing: Boolean = false) {
                 call.respondText("${checkStatus(userId)}")
             }catch(e: java.lang.IllegalStateException)
             {
-                call.respond(HttpStatusCode(69, "AYYY LMAO"), "Does Not Exist")
+                call.respond(HttpStatusCode(1150, "AYYY LMAO"), "Does Not Exist")
             }
 
         }
@@ -92,7 +92,12 @@ fun Application.module(testing: Boolean = false) {
             val tagN : String = call.request.header("tag-id") ?: "0"
             val userId : String = call.request.header("user-id") ?: "0"
 
-            tag(tagN, userId)
+            try {
+                tag(tagN, userId)
+            }catch (e: java.lang.IllegalStateException)
+            {
+                call.respond(HttpStatusCode(1151, "AYYY LMAO"), "Does Not Exist")
+            }
         }
 
         //If a player moves phones, this will change the macAddress so that they don't have to use a password
@@ -109,7 +114,12 @@ fun Application.module(testing: Boolean = false) {
             val mac : String = call.request.header("mac") ?: "0"
             val grpCode : String = call.request.header("group-id") ?: "0"
 
-            regGroup(userId, mac, grpCode)
+            try {
+                regGroup(userId, mac, grpCode)
+            }catch (e: java.lang.IllegalStateException)
+            {
+                call.respond(HttpStatusCode(1152, "AYYY LMAO"), "Does Not Exist")
+            }
         }
 
         get("/join-grp")
@@ -118,7 +128,12 @@ fun Application.module(testing: Boolean = false) {
             val mac : String = call.request.header("mac") ?: "0"
             val grpCode : String = call.request.header("group-id") ?: "0"
 
-            joinGroup(userId, mac, grpCode)
+            try {
+                joinGroup(userId, mac, grpCode)
+            }catch(e: java.lang.IllegalStateException)
+            {
+                call.respond(HttpStatusCode(1153, "AYYY LMAO"), "Does Not Exist")
+            }
         }
 
         get("/leader")
@@ -133,7 +148,7 @@ fun Application.module(testing: Boolean = false) {
             val grpCode : String = call.request.header("group-id") ?: "0"
 
             registerPlayer(userId, mac, grpCode)
-            
+
             call.respondText("User ID: $userId Registered", contentType = ContentType.Text.Plain)
         }
 
