@@ -42,7 +42,10 @@ fun joinGroup(userId : String, mac : String, grpCode : String)
 
 fun checkGroup(userId : String, grpCode : String) : Boolean
 {
-  return true
+    val query: Query = Players.slice(Players.groupId).
+        select { Players.groupId eq grpCode }
+
+    return !query.empty()
 }
 
 fun regGroup(userId : String, mac : String, grpCode : String)
