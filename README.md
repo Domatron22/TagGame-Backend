@@ -1,7 +1,7 @@
 # TagGame-Backend
 Backend programming for Final Project for Kotlin Programming
 
-**Scope**
+**Scope:**
   This project is for the serverside code for my project located **here:** https://github.com/Domatron22/GameOfTag
   
 This project contains the database and all of the data so that the application
