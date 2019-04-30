@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.Table
  * Language: Kotlin
  * Project: TagGame-Backend
  * Description:
- *
+ * Database for the server
  *
  */
 object Players : Table(){

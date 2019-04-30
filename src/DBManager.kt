@@ -89,3 +89,23 @@ fun checkStatus(userId : String) : Int
 
     return query.first()[Players.status]
 }
+
+fun checkUser(mac : String) : String
+{
+    //Checks to see if the user is 'it'
+    val query: Query = Players.slice(Players.user).
+        select { Players.macAddrs eq mac }.withDistinct()
+
+
+    return query.first()[Players.user]
+}
+
+fun tagGet(mac : String) : String
+{
+    //Checks to see if the user is 'it'
+    val query: Query = Players.slice(Players.tid).
+        select { Players.macAddrs eq mac }.withDistinct()
+
+
+    return query.first()[Players.tid]
+}

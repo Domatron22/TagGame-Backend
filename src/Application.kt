@@ -45,7 +45,7 @@ fun Application.module(testing: Boolean = false) {
         header("mac")
         header("group-id")
         allowCredentials = true
-        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+        anyHost() 
     }
 
     install(ContentNegotiation) {
@@ -134,6 +134,32 @@ fun Application.module(testing: Boolean = false) {
             {
                 call.respond(HttpStatusCode(1153, "AYYY LMAO"), "Does Not Exist")
             }
+        }
+
+        get("/check-user")
+        {
+            val mac : String = call.request.header("mac") ?: "0"
+
+            try {
+                call.respondText("${checkUser(mac)}")
+            }catch(e: java.lang.IllegalStateException)
+            {
+                call.respond(HttpStatusCode(1154, "AYYY LMAO"), "Does Not Exist")
+            }
+
+        }
+
+        get("/get-tag")
+        {
+            val mac : String = call.request.header("mac") ?: "0"
+
+            try {
+                call.respondText("${tagGet(mac)}")
+            }catch(e: java.lang.IllegalStateException)
+            {
+                call.respond(HttpStatusCode(1155, "AYYY LMAO"), "Does Not Exist")
+            }
+
         }
 
         get("/leader")
