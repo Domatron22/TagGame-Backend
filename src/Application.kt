@@ -45,7 +45,7 @@ fun Application.module(testing: Boolean = false) {
         header("mac")
         header("group-id")
         allowCredentials = true
-        anyHost() 
+        anyHost()
     }
 
     install(ContentNegotiation) {
@@ -158,6 +158,20 @@ fun Application.module(testing: Boolean = false) {
             }catch(e: java.lang.IllegalStateException)
             {
                 call.respond(HttpStatusCode(1155, "AYYY LMAO"), "Does Not Exist")
+            }
+
+        }
+
+        get("/set-tag")
+        {
+            val mac : String = call.request.header("mac") ?: "0"
+            val tid : String = call.request.header("tid") ?: "0"
+
+            try {
+                call.respondText("${tagSet(mac, tid)}")
+            }catch(e: java.lang.IllegalStateException)
+            {
+                call.respond(HttpStatusCode(1156, "AYYY LMAO"), "Does Not Exist")
             }
 
         }
