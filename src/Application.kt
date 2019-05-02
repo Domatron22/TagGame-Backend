@@ -32,7 +32,8 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
 
-    val db = Database.connect("jdbc:sqlite:/Players.db", "org.sqlite.JDBC")
+
+
 
     install(CORS) {
         method(HttpMethod.Options)
@@ -186,7 +187,7 @@ fun Application.module(testing: Boolean = false) {
             val userId : String = call.request.header("user-id") ?: "0"
             val mac : String = call.request.header("mac") ?: "0"
             val grpCode : String = call.request.header("group-id") ?: "0"
-
+            println(userId + mac + grpCode)
             registerPlayer(userId, mac, grpCode)
 
             call.respondText("User ID: $userId Registered", contentType = ContentType.Text.Plain)

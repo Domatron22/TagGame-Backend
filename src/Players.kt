@@ -12,10 +12,10 @@ import org.jetbrains.exposed.sql.Table
  *
  */
 object Players : Table(){
-    var user: Column<String> = varchar("",50).primaryKey()
-    var tid: Column<String> = varchar("",50)
-    var status: Column<Int> = integer("0")
-    var tcount: Column<Int> = integer("0")
-    var groupId: Column<String> = varchar("",50).primaryKey()
-    var macAddrs: Column<String> = varchar("",50).primaryKey()
+    var user: Column<String> = varchar("user",50).primaryKey()
+    var tid: Column<String> = varchar("tid",50)
+    var status: Column<Int> = integer("status")
+    var tcount: Column<Int> = integer("tcount")
+    var groupId: Column<String> = varchar("groupId",50).primaryKey()
+    var macAddrs: Column<String> = varchar("macAddrs",50).primaryKey()
 }

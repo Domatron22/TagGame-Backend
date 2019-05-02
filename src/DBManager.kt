@@ -2,6 +2,7 @@ package com.domatron
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.transactions.transaction
 
 /* Author: Dominic Triano
  * Date: 4/29/2019
@@ -12,105 +13,134 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
  *
  */
 
+
 fun registerPlayer(userId : String, mac : String, grpCode : String)
 {
-    val id = Players.insert {
-        it[user] = "$userId"
-        it[macAddrs] = "$mac"
-        it[groupId] = "$grpCode"
-        it[status] = 0
-        it[tid] = ""
-        it[tcount] = 0
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+
+
+    transaction {
+        SchemaUtils.create(Players)
+
+        Players.insert {
+            it[user] = userId
+            it[macAddrs] = mac
+            it[groupId] = grpCode
+            it[status] = 0
+            it[tid] = ""
+            it[tcount] = 0
+        }
     }
 }
 
 fun joinGroup(userId : String, mac : String, grpCode : String)
 {
-    //sees if the group is created
-    val query: Query = Players.slice(Players.groupId).
-        select { Players.groupId eq grpCode }
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
 
-    //if the group is existing, then allows the player to join
-    if(checkGroup(userId, grpCode))
-    {
-        registerPlayer(userId, mac, grpCode)
-    }else
-    {
-        //TODO -- Send to user, "Unexisting Group, Please try again"
+    transaction {
+        SchemaUtils.create(Players)
+        //sees if the group is created
+        val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
+
+        //if the group is existing, then allows the player to join
+        if (checkGroup(userId, grpCode).isNotEmpty()) {
+            registerPlayer(userId, mac, grpCode)
+        } else {
+            //TODO -- Send to user, "Unexisting Group, Please try again"
+        }
     }
 }
 
-fun checkGroup(userId : String, grpCode : String) : Boolean
+fun checkGroup(userId : String, grpCode : String) : String
 {
-    val query: Query = Players.slice(Players.groupId).
-        select { Players.groupId eq grpCode }
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
 
-    return !query.empty()
+    return transaction {
+        SchemaUtils.create(Players)
+        val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
+        query.first()[Players.groupId]
+    }
 }
 
 fun regGroup(userId : String, mac : String, grpCode : String)
 {
-    //sees if the group is created
-    val query: Query = Players.slice(Players.groupId).
-        select { Players.groupId eq grpCode }
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
 
-    //if the group is existing, then the player must make a new group ID
-    if(!checkGroup(userId, grpCode))
-    {
-        registerPlayer(userId, mac, grpCode)
-    }else
-    {
-        //TODO -- Send to user, "Existing Group, Please try again"
+    transaction {
+        SchemaUtils.create(Players)
+        //sees if the group is created
+        val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
+
+        //if the group is existing, then the player must make a new group ID
+        if (checkGroup(userId, grpCode).isEmpty()) {
+            registerPlayer(userId, mac, grpCode)
+        } else {
+            //TODO -- Send to user, "Existing Group, Please try again"
+        }
     }
 }
 
 fun tag(tagN : String, userId : String)
 {
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
 
-    //Set player who tagged the player's status to not 'it'
-    Players.update ({Players.user eq userId}){
-        it[Players.status] = 0
+    transaction {
+        SchemaUtils.create(Players)
+        //Set player who tagged the player's status to not 'it'
+        Players.update({ Players.user eq userId }) {
+            it[Players.status] = 0
+        }
+
+        //Set players status who was tagged to 'it'
+        Players.update({ Players.tid eq tagN }) {
+            it[Players.status] = 1
+        }
     }
-
-    //Set players status who was tagged to 'it'
-    Players.update ({Players.tid eq tagN}){
-        it[Players.status] = 1
-    }
-
     //TODO -- Also increment the tcount by one of the player who got tagged
 }
 
 fun checkStatus(userId : String) : Int
 {
-    //Checks to see if the user is 'it'
-    val query: Query = Players.slice(Players.status).
-        select { Players.user eq userId }.withDistinct()
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
 
-
-    return query.first()[Players.status]
+    return transaction {
+        SchemaUtils.create(Players)
+        //Checks to see if the user is 'it'
+        val query: Query = Players.slice(Players.status).select { Players.user eq userId }.withDistinct()
+        query.first()[Players.status]
+    }
 }
 
 fun checkUser(mac : String) : String
 {
-    val query: Query = Players.slice(Players.user).
-        select { Players.macAddrs eq mac }.withDistinct()
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
 
-
-    return query.first()[Players.user]
+    return transaction {
+        SchemaUtils.create(Players)
+        val query: Query = Players.slice(Players.user).select { Players.macAddrs eq mac }.withDistinct()
+        query.first()[Players.user]
+    }
 }
 
 fun tagGet(mac : String) : String
 {
-    val query: Query = Players.slice(Players.tid).
-        select { Players.macAddrs eq mac }.withDistinct()
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
 
-
-    return query.first()[Players.tid]
+    return transaction {
+        SchemaUtils.create(Players)
+        val query: Query = Players.slice(Players.tid).select { Players.macAddrs eq mac }.withDistinct()
+        query.first()[Players.tid]
+    }
 }
 
 fun tagSet(mac : String, tagN : String)
 {
-    Players.update ({Players.macAddrs eq mac}){
-        it[Players.tid] = tagN
+    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+
+    transaction {
+        SchemaUtils.create(Players)
+        Players.update({ Players.macAddrs eq mac }) {
+            it[Players.tid] = tagN
+        }
     }
 }
