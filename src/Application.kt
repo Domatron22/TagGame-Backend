@@ -84,6 +84,14 @@ fun Application.module(testing: Boolean = false) {
             }catch(e: java.lang.IllegalStateException)
             {
                 call.respond(HttpStatusCode(1150, "AYYY LMAO"), "Does Not Exist")
+            }catch (e: java.util.NoSuchElementException)
+            {
+                call.respond(HttpStatusCode(1150, "AYYY LMAO"), "Does Not Exist")
+
+            }catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException)
+            {
+                call.respond(HttpStatusCode(1150, "AYYY LMAO"), "Does Not Exist")
+
             }
 
         }
@@ -134,6 +142,14 @@ fun Application.module(testing: Boolean = false) {
             }catch(e: java.lang.IllegalStateException)
             {
                 call.respond(HttpStatusCode(1153, "AYYY LMAO"), "Does Not Exist")
+            }catch (e: java.util.NoSuchElementException)
+            {
+                call.respond(HttpStatusCode(1153, "AYYY LMAO"), "Does Not Exist")
+
+            }catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException)
+            {
+                call.respond(HttpStatusCode(1153, "AYYY LMAO"), "Does Not Exist")
+
             }
         }
 
@@ -142,10 +158,14 @@ fun Application.module(testing: Boolean = false) {
             val mac : String = call.request.header("mac") ?: "0"
 
             try {
-                call.respondText("${checkUser(mac)}")
+                call.respondText(checkUser(mac))
             }catch(e: java.lang.IllegalStateException)
             {
                 call.respond(HttpStatusCode(1154, "AYYY LMAO"), "Does Not Exist")
+            }catch (e: java.util.NoSuchElementException)
+            {
+                call.respond(HttpStatusCode(1154, "AYYY LMAO"), "Does Not Exist")
+
             }
 
         }
@@ -155,10 +175,18 @@ fun Application.module(testing: Boolean = false) {
             val mac : String = call.request.header("mac") ?: "0"
 
             try {
-                call.respondText("${tagGet(mac)}")
+                call.respondText(tagGet(mac))
             }catch(e: java.lang.IllegalStateException)
             {
                 call.respond(HttpStatusCode(1155, "AYYY LMAO"), "Does Not Exist")
+            }catch (e: java.util.NoSuchElementException)
+            {
+                call.respond(HttpStatusCode(1155, "AYYY LMAO"), "Does Not Exist")
+
+            }catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException)
+            {
+                call.respond(HttpStatusCode(1155, "AYYY LMAO"), "Does Not Exist")
+
             }
 
         }
@@ -169,10 +197,14 @@ fun Application.module(testing: Boolean = false) {
             val tid : String = call.request.header("tid") ?: "0"
 
             try {
-                call.respondText("${tagSet(mac, tid)}")
+                tagSet(mac, tid)
             }catch(e: java.lang.IllegalStateException)
             {
                 call.respond(HttpStatusCode(1156, "AYYY LMAO"), "Does Not Exist")
+            }catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException)
+            {
+                call.respond(HttpStatusCode(1156, "AYYY LMAO"), "Does Not Exist")
+
             }
 
         }
