@@ -18,10 +18,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun registerPlayer(userId : String, mac : String, grpCode : String)
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
-    SchemaUtils.create(Players)
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
+//    SchemaUtils.create(Players)
 
     transaction {
+        SchemaUtils.create(Players)
+
         Players.insert {
             it[user] = userId
             it[macAddrs] = mac
@@ -35,9 +37,10 @@ fun registerPlayer(userId : String, mac : String, grpCode : String)
 
 fun joinGroup(userId : String, mac : String, grpCode : String)
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
 
     transaction {
+
         //sees if the group is created
         val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
 
@@ -52,21 +55,27 @@ fun joinGroup(userId : String, mac : String, grpCode : String)
 
 fun checkGroup(userId : String, grpCode : String) : String
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
 
-    return transaction {
+    var grp : String = ""
+
+    transaction {
         val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
-        query.first()[Players.groupId]
+        grp = query.first()[Players.groupId]
     }
+
+    return grp
 }
 
 fun regGroup(userId : String, mac : String, grpCode : String)
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
-    SchemaUtils.create(Players)
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
+//    SchemaUtils.create(Players)
 
 
     transaction {
+        SchemaUtils.create(Players)
+
         registerPlayer(userId, mac, grpCode)
         //sees if the group is created
         //val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
@@ -82,7 +91,7 @@ fun regGroup(userId : String, mac : String, grpCode : String)
 
 fun tag(tagN : String, userId : String)
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
 
     transaction {
         //Set player who tagged the player's status to not 'it'
@@ -98,40 +107,51 @@ fun tag(tagN : String, userId : String)
     //TODO -- Also increment the tcount by one of the player who got tagged
 }
 
-fun checkStatus(userId : String) : Int
+fun checkStatus(userId : String) : String
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
+    var stats : String = "5"
 
-    return transaction {
+    transaction {
         //Checks to see if the user is 'it'
         val query: Query = Players.slice(Players.status).select { Players.user eq userId }.withDistinct()
-        query.first()[Players.status]
+        stats = query.first()[Players.status].toString()
     }
+    
+    println(stats)
+    return stats
 }
 
 fun checkUser(mac : String) : String
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test", "org.h2.Driver")
+    var userN : String = ""
 
-    return transaction {
+    transaction {
         val query: Query = Players.slice(Players.user).select { Players.macAddrs eq mac }.withDistinct()
-        query.first()[Players.user]
+        userN = query.first()[Players.user]
     }
+
+     println(userN)
+    return userN
 }
 
 fun tagGet(mac : String) : String
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
+    var tag : String = ""
 
-    return transaction {
+    transaction {
         val query: Query = Players.slice(Players.tid).select { Players.macAddrs eq mac }.withDistinct()
-        query.first()[Players.tid]
+        tag = query.first()[Players.tid]
     }
+
+    return tag
 }
 
 fun tagSet(mac : String, tagN : String)
 {
-    Database.connect("jdbc:h2:mem:Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
 
     transaction {
         Players.update({ Players.macAddrs eq mac }) {

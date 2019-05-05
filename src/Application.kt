@@ -36,6 +36,7 @@ fun Application.module(testing: Boolean = false) {
 
 
     install(CORS) {
+
         method(HttpMethod.Options)
         method(HttpMethod.Put)
         method(HttpMethod.Delete)
@@ -80,7 +81,7 @@ fun Application.module(testing: Boolean = false) {
             val userId : String = call.request.header("user-id") ?: "0"
 
             try {
-                call.respondText("${checkStatus(userId)}")
+                call.respondText(checkStatus(userId))
             }catch(e: java.lang.IllegalStateException)
             {
                 call.respond(HttpStatusCode(1150, "AYYY LMAO"), "Does Not Exist")
