@@ -35,9 +35,28 @@ fun registerPlayer(userId : String, mac : String, grpCode : String)
     }
 }
 
+fun initialPlayer(userId : String, mac : String, grpCode : String)
+{
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
+//    SchemaUtils.create(Players)
+
+    transaction {
+        SchemaUtils.create(Players)
+
+        Players.insert {
+            it[user] = userId
+            it[macAddrs] = mac
+            it[groupId] = grpCode
+            it[status] = 1
+            it[tid] = ""
+            it[tcount] = 0
+        }
+    }
+}
+
 fun joinGroup(userId : String, mac : String, grpCode : String)
 {
-    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
 
     transaction {
 
@@ -76,22 +95,22 @@ fun regGroup(userId : String, mac : String, grpCode : String)
     transaction {
         SchemaUtils.create(Players)
 
-        registerPlayer(userId, mac, grpCode)
+        //registerPlayer(userId, mac, grpCode)
         //sees if the group is created
-        //val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
+        val query: Query = Players.slice(Players.groupId).select { Players.groupId eq grpCode }
 
         //if the group is existing, then the player must make a new group ID
-//        if (checkGroup(userId, grpCode).isBlank()) {
-//            registerPlayer(userId, mac, grpCode)
-//        } else {
-//            //TODO -- Send to user, "Existing Group, Please try again"
-//        }
+        if (checkGroup(userId, grpCode).isBlank()) {
+            initialPlayer(userId, mac, grpCode)
+        } else {
+            //TODO -- Send to user, "Existing Group, Please try again"
+        }
     }
 }
 
 fun tag(tagN : String, userId : String)
 {
-    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
 
     transaction {
         //Set player who tagged the player's status to not 'it'
@@ -109,7 +128,7 @@ fun tag(tagN : String, userId : String)
 
 fun checkStatus(userId : String) : String
 {
-    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
     var stats : String = "5"
 
     transaction {
@@ -117,14 +136,14 @@ fun checkStatus(userId : String) : String
         val query: Query = Players.slice(Players.status).select { Players.user eq userId }.withDistinct()
         stats = query.first()[Players.status].toString()
     }
-    
+
     println(stats)
     return stats
 }
 
 fun checkUser(mac : String) : String
 {
-    Database.connect("jdbc:h2:./test", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
     var userN : String = ""
 
     transaction {
@@ -138,7 +157,7 @@ fun checkUser(mac : String) : String
 
 fun tagGet(mac : String) : String
 {
-    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
     var tag : String = ""
 
     transaction {
@@ -151,7 +170,7 @@ fun tagGet(mac : String) : String
 
 fun tagSet(mac : String, tagN : String)
 {
-    Database.connect("jdbc:h2:~/Players", "org.h2.Driver")
+    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
 
     transaction {
         Players.update({ Players.macAddrs eq mac }) {
@@ -159,3 +178,14 @@ fun tagSet(mac : String, tagN : String)
         }
     }
 }
+
+//fun startGame(mac : String)
+//{
+//    Database.connect("jdbc:h2:./test;DB_CLOSE_DELAY=-1", "org.h2.Driver")
+//
+//    transaction {
+//        Players.update({ Players.macAddrs eq mac }) {
+//            it[Players.status] = 1
+//        }
+//    }
+//}
